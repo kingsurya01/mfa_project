@@ -260,15 +260,26 @@ The system supports secure password recovery:
 
 ---
 
-## Author
+## Team Members
 
-**Surya Prakash V**
-
-B.Tech Artificial Intelligence and Data Science
-
-Panimalar Engineering College
+| Name                     | Role                                                                              |
+| ------------------------ | --------------------------------------------------------------------------------- |
+| **Titus Jakin Daniel I** | Project Development                                                               |
+| **Vetriswar K**          | Frontend Development                                                              |
+| **Surya Prakash V**      | Backend Development, MFA Integration                                              |
 
 ---
+
+## Project Overview
+
+This project was collaboratively developed as a secure Multi-Factor Authentication (MFA) system using Flask. The application enhances login security through multiple verification layers including password authentication, image CAPTCHA verification, email OTP verification, and authenticator-based verification.
+
+---
+
+## Acknowledgements
+
+Developed as part of the B.Tech Artificial Intelligence and Data Science curriculum at **Panimalar Engineering College**.
+
 
 ## License
 
