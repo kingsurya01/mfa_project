@@ -1,0 +1,70 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Google Authenticator — Multi-Factor Auth</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+<style>
+.qr-wrapper{display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem}
+.qr-wrapper img{width:200px;height:200px;border-radius:.6rem;background:white;padding:.5rem}
+</style>
+</head>
+<body>
+<main class="auth-shell">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+  <section class="auth-card">
+    <div class="brand">
+      <span class="badge">Step 4 / 4 · Authenticator Verification</span>
+      <h1 class="brand-title">{% if new_user %}Link Authenticator{% else %}Verify Authenticator{% endif %}</h1>
+      {% if new_user %}
+      <p class="subtitle">Scan the QR code with Google Authenticator, then enter the code.</p>
+      {% else %}
+      <p class="subtitle">Enter the 6-digit code from your authenticator app.</p>
+      {% endif %}
+    </div>
+
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
+
+    {% if new_user %}
+    <div class="field center">
+      <label>Scan this QR code</label>
+      <div class="qr-wrapper">
+        <img src="{{ url_for('qr_code') }}" alt="QR Code">
+      </div>
+      <p class="muted">A secret key will be generated for your account.</p>
+    </div>
+    {% endif %}
+
+    <form method="POST" action="/verify_authenticator">
+      <div class="field">
+        <label for="code">Authenticator Code</label>
+        <input id="code" type="text" name="code" inputmode="numeric" placeholder="● ● ● ● ● ●" class="center-text" maxlength="6" required />
+      </div>
+      <button type="submit" class="neon-button">Verify &amp; Continue</button>
+    </form>
+
+{% if not new_user %}
+<div class="footer-note">
+  <form method="POST" action="/reset_qr">
+
+    <button
+      type="submit"
+      class="neon-button secondary">
+
+      Resend QR Code
+
+    </button>
+
+  </form>
+</div>
+{% endif %}
+  </section>
+</main>
+</body>
+</html>

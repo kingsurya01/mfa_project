@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Text CAPTCHA — Multi-Factor Auth</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
+<main class="auth-shell">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+  <section class="auth-card">
+    <div class="brand">
+      <span class="badge">Step 1 / 4 · CAPTCHA Verification</span>
+      <h1 class="brand-title">Text CAPTCHA</h1>
+      <p class="subtitle">Type the characters shown in the image below to prove you're human.</p>
+    </div>
+
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="/verify_captcha">
+      <div class="field">
+        <label>CAPTCHA Image</label>
+        <div class="placeholder-box">
+          <img src="{{ url_for('captcha') }}" alt="CAPTCHA" style="max-width:200px;max-height:100px;">
+        </div>
+      </div>
+      <div class="field">
+        <label for="captcha">Enter CAPTCHA text</label>
+        <input id="captcha" type="text" name="captcha" placeholder="Type the text you see" autocomplete="off" required />
+      </div>
+      <button type="submit" class="neon-button">Verify CAPTCHA</button>
+    </form>
+  </section>
+</main>
+</body>
+</html>

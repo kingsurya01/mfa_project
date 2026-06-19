@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Image CAPTCHA — Multi-Factor Auth</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+<style>
+.image-wrapper{position:relative;width:100%;margin-bottom:1.1rem}
+.captcha-image{width:100%;display:block;border-radius:.6rem}
+.grid{position:absolute;top:0;left:0;width:100%;height:100%;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr)}
+.grid label{border:1px solid rgba(255,255,255,.2);cursor:pointer;position:relative}
+.grid input{position:absolute;opacity:0}
+.grid input:checked + span{background:rgba(59,111,160,.4);border:3px solid #3b6fa0}
+.grid span{position:absolute;width:100%;height:100%;transition:all .2s}
+.result-message{text-align:center;margin-top:1rem;color:#f59e0b;font-size:.9rem}
+</style>
+</head>
+<body>
+<main class="auth-shell">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+  <section class="auth-card">
+    <div class="brand">
+      <span class="badge">Step 1 / 4 · CAPTCHA Verification</span>
+      <h1 class="brand-title">Image CAPTCHA</h1>
+      <p class="subtitle">{{ instruction }}</p>
+    </div>
+
+    {% if result %}
+    <div class="error">{{ result }}</div>
+    {% endif %}
+
+    <form action="/verify_captcha" method="POST">
+      <div class="field">
+        <label>Select matching images</label>
+        <div class="image-wrapper">
+          <img src="{{ url_for('static', filename=image) }}" class="captcha-image" alt="CAPTCHA">
+          <div class="grid">
+            {% for i in range(1, 10) %}
+            <label>
+              <input type="checkbox" name="boxes" value="{{ i }}">
+              <span></span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="neon-button">Verify CAPTCHA</button>
+    </form>
+  </section>
+</main>
+</body>
+</html>

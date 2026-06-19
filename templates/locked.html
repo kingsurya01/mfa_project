@@ -1,0 +1,118 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Account Locked — Multi-Factor Authentication</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+
+</head>
+
+<body>
+
+<main class="auth-shell">
+
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+
+    <section class="auth-card">
+
+        <div class="brand">
+
+            <span class="badge">
+                SECURITY ALERT
+            </span>
+
+            <h1 class="brand-title">
+                Account Locked
+            </h1>
+
+            <p class="subtitle">
+                Multi-Factor Authentication Protection
+            </p>
+
+        </div>
+
+        <div class="center">
+
+            <div class="alert-icon">
+                ⚠
+            </div>
+
+            <p>
+                Too many failed CAPTCHA attempts detected.
+            </p>
+
+            <p class="muted" style="margin-top:0.5rem;">
+                Your account has been temporarily locked for security reasons.
+            </p>
+
+        <div class="timer-box">
+            🔒 Unlocks in
+            <span id="countdown"></span>
+        </div>
+
+            <div style="margin-top:1.5rem;">
+
+                <a href="/"
+                   class="neon-button"
+                   style="text-decoration:none;display:inline-block;width:auto;padding:.7rem 1.5rem;">
+
+                    Try Again
+
+                </a>
+
+            </div>
+
+        </div>
+
+        <div class="footer-note">
+            Secure Multi-Factor Authentication System
+        </div>
+
+    </section>
+
+</main>
+<script>
+
+let remaining = {{ seconds }};
+
+function updateTimer() {
+
+    let minutes = Math.floor(
+        remaining / 60
+    );
+
+    let seconds = remaining % 60;
+
+    document.getElementById(
+        "countdown"
+    ).innerHTML =
+        minutes + ":" +
+        String(seconds).padStart(2, '0');
+
+    if (remaining <= 0) {
+
+        window.location.href = "/";
+        return;
+    }
+
+    remaining--;
+}
+
+updateTimer();
+
+setInterval(
+    updateTimer,
+    1000
+);
+
+</script>
+</body>
+</html>
+

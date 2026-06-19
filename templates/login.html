@@ -1,0 +1,53 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Login — Multi-Factor Auth</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
+<main class="auth-shell">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+  <section class="auth-card">
+    <div class="brand">
+      <span class="badge">Step 2 / 4 · Login Verification</span>
+      <h1 class="brand-title">Login</h1>
+      <p class="subtitle">Enter your email and password to continue.</p>
+    </div>
+
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="/login_verify">
+      <div class="field">
+        <label for="email">Email Address</label>
+        <input id="email" type="email" name="email" placeholder="Enter your email" required />
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" name="password" placeholder="Enter your password" required />
+      </div>
+<button type="submit" class="neon-button">
+    Verify Credentials
+</button>
+
+<div class="center" style="margin-top:1rem">
+
+    <a href="/forgot_password"
+       class="linkish">
+
+        Forgot Password?
+
+    </a>
+
+</div>    </form>
+  </section>
+</main>
+</body>
+</html>
+

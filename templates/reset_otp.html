@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OTP Verification — MFA Security</title>
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}">
+
+</head>
+
+<body>
+
+<main class="auth-shell">
+
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+
+    <section class="auth-card">
+
+        <div class="brand">
+
+            <span class="badge">
+                Account Recovery
+            </span>
+
+            <h1 class="brand-title">
+                Verify OTP
+            </h1>
+
+            <p class="subtitle">
+                Enter the OTP sent to your registered email address.
+            </p>
+
+        </div>
+
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if success %}
+        <div class="success">
+            {{ success }}
+        </div>
+        {% endif %}
+
+        <form method="POST"
+              action="/verify_reset_otp">
+
+            <div class="field">
+
+                <label for="otp">
+                    Reset OTP
+                </label>
+
+                <input
+                    id="otp"
+                    type="text"
+                    name="otp"
+                    maxlength="6"
+                    placeholder="Enter 6-Digit OTP"
+                    class="center-text"
+                    required>
+
+            </div>
+
+            <button
+                type="submit"
+                class="neon-button">
+
+                Verify OTP
+
+            </button>
+
+        </form>
+
+        <div class="footer-note">
+
+            <a href="/forgot_password"
+               class="linkish">
+
+               Back
+
+            </a>
+
+        </div>
+
+    </section>
+
+</main>
+
+</body>
+</html>

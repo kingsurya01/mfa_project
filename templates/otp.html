@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>OTP Verification — Multi-Factor Auth</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
+
+<main class="auth-shell">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+
+  <section class="auth-card">
+
+    <div class="brand">
+      <span class="badge">Step 3 / 4 · OTP Verification</span>
+      <h1 class="brand-title">Enter OTP</h1>
+      <p class="subtitle">Check your email for the 6-digit code.</p>
+    </div>
+
+    {% if error %}
+    <div class="error">
+      {{ error }}
+    </div>
+    {% endif %}
+
+    <!-- OTP Verification Form -->
+    <form method="POST" action="/verify_otp">
+
+      <div class="field">
+        <label for="otp">One-Time Password</label>
+
+        <input
+          id="otp"
+          type="text"
+          name="otp"
+          inputmode="numeric"
+          placeholder="● ● ● ● ● ●"
+          class="center-text"
+          maxlength="6"
+          required />
+      </div>
+
+      <div class="row">
+        <span class="muted">
+          Enter the code from your email
+        </span>
+      </div>
+
+      <button
+        type="submit"
+        class="neon-button">
+        Verify OTP
+      </button>
+
+    </form>
+
+    <!-- Resend OTP Form -->
+    <div class="center" style="margin-top:1rem">
+
+      <form method="POST" action="/resend_otp">
+
+        <button
+          type="submit"
+          class="neon-button secondary"
+          style="padding:.5rem 1rem;font-size:.9rem">
+
+          Resend OTP
+
+        </button>
+
+      </form>
+
+    </div>
+
+  </section>
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+/* MFA Auth — Navy Trust theme (pure HTML/CSS export) */
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;color:#e8edf3}
+body{
+  background-color:#080e1f;
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(59,111,160,0.45), transparent 45%),
+    radial-gradient(circle at 88% 12%, rgba(45,90,138,0.45), transparent 50%),
+    radial-gradient(circle at 75% 85%, rgba(59,111,160,0.5), transparent 55%),
+    radial-gradient(circle at 15% 90%, rgba(30,58,95,0.35), transparent 50%),
+    linear-gradient(135deg,#0f1b3d,#0a0f1f);
+  background-attachment:fixed;background-size:200% 200%;
+  animation:aurora 22s ease-in-out infinite alternate;
+}
+@keyframes aurora{0%{background-position:0% 0%}50%{background-position:100% 50%}100%{background-position:50% 100%}}
+@keyframes float-blob{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(20px,-30px,0) scale(1.08)}}
+
+.auth-shell{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;overflow:hidden}
+.blob{position:absolute;border-radius:9999px;filter:blur(60px);opacity:.55;pointer-events:none;animation:float-blob 12s ease-in-out infinite}
+.blob.b1{width:380px;height:380px;background:#3b6fa0;top:-80px;left:-60px}
+.blob.b2{width:340px;height:340px;background:#2d5a8a;bottom:-100px;right:-80px;animation-delay:-4s}
+.blob.b3{width:260px;height:260px;background:#5b8fc0;top:40%;left:55%;animation-delay:-8s}
+
+.auth-card{position:relative;width:100%;max-width:28rem;border-radius:1.125rem;padding:2rem;
+  background:linear-gradient(145deg, rgba(30,58,95,0.75), rgba(22,42,74,0.65));
+  border:1px solid rgba(255,255,255,0.12);
+  box-shadow:0 30px 80px -30px rgba(0,0,0,0.7), 0 20px 60px -20px rgba(59,111,160,0.55), 0 8px 30px -10px rgba(59,111,160,0.35);
+  backdrop-filter: blur(18px);-webkit-backdrop-filter:blur(18px);
+}
+.brand{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:1.25rem}
+.brand .badge{font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:#8fa8c4;margin-bottom:.5rem}
+.brand-title{
+  font-size:1.75rem;font-weight:800;letter-spacing:-.02em;margin:0;
+  background:linear-gradient(135deg,#3b6fa0,#2d5a8a,#5b8fc0);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.subtitle{color:#8fa8c4;font-size:.9rem;margin-top:.5rem}
+
+.nav-pills{display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center;margin-bottom:1.25rem}
+.nav-pills a{font-size:.72rem;color:#cfd8e3;text-decoration:none;padding:.3rem .6rem;border-radius:999px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04)}
+.nav-pills a:hover{background:rgba(255,255,255,.1)}
+.nav-pills a.active{background:linear-gradient(135deg,#3b6fa0,#2d5a8a);border-color:transparent;color:#fff}
+
+label{display:block;margin-bottom:.5rem;font-size:.85rem;color:#cfd8e3}
+.field{margin-bottom:1.1rem}
+input[type=text],input[type=email],input[type=password],input[type=tel],input{
+  width:100%;background:rgba(255,255,255,.05);color:#e8edf3;border:1px solid rgba(255,255,255,.14);
+  border-radius:.6rem;padding:.7rem .85rem;font-size:.95rem;outline:none;transition:border-color .15s, box-shadow .15s;
+}
+input::placeholder{color:#7b91ad}
+input:focus{border-color:#3b6fa0;box-shadow:0 0 0 3px rgba(59,111,160,.35)}
+.center-text{text-align:center;letter-spacing:.6em;font-size:1.1rem}
+.muted{color:#8fa8c4;font-size:.85rem}
+.row{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.linkish{color:#5b8fc0;text-decoration:none;font-size:.85rem}
+.linkish:hover{text-decoration:underline}
+
+.neon-button{
+  display:inline-flex;align-items:center;justify-content:center;width:100%;
+  background:linear-gradient(135deg,#3b6fa0,#2d5a8a,#5b8fc0);
+  color:#fff;font-weight:600;border:0;border-radius:.75rem;padding:.8rem 1.25rem;cursor:pointer;
+  box-shadow:0 10px 30px -10px rgba(59,111,160,.6);transition:transform .2s, filter .2s, box-shadow .2s;
+}
+.neon-button:hover{transform:translateY(-1px);filter:brightness(1.08);box-shadow:0 18px 40px -10px rgba(59,111,160,.7)}
+.neon-button:active{transform:translateY(0)}
+.neon-button.secondary{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);box-shadow:none}
+
+.btn-row{display:flex;gap:.6rem}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;padding:.6rem .8rem;border-radius:.6rem;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);color:#e8edf3;cursor:pointer}
+.icon-btn:hover{background:rgba(255,255,255,.1)}
+
+.placeholder-box{display:flex;align-items:center;justify-content:center;width:100%;height:110px;border-radius:.6rem;
+  border:1px dashed rgba(255,255,255,.25);background:rgba(255,255,255,.04);color:#8fa8c4;font-size:.75rem;
+  letter-spacing:.08em;text-transform:uppercase}
+.placeholder-box.tall{height:180px}
+.placeholder-box.qr{height:14rem;width:14rem;border-radius:1rem;margin:0 auto}
+
+.footer-note{text-align:center;margin-top:1.25rem;color:#8fa8c4;font-size:.8rem}
+.alert-icon{width:64px;height:64px;border-radius:1rem;display:flex;align-items:center;justify-content:center;
+  color:#fff;background:linear-gradient(135deg,#8b3a3a,#3b6fa0);
+  box-shadow:0 18px 50px -15px rgba(139,58,58,.6);margin:0 auto 1.25rem;font-size:1.8rem}
+.timer-box{margin-top:1.5rem;display:inline-block;padding:.6rem 1.25rem;border-radius:.75rem;
+  border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);font-family:ui-monospace,Menlo,monospace;font-size:1.05rem}
+.center{text-align:center}
+.error{color:#ef4444;text-align:center;margin-bottom:1rem;padding:.75rem;border-radius:.6rem;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3)}
+.success{color:#16a34a;text-align:center;margin-bottom:1rem;padding:.75rem;border-radius:.6rem;background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.3)}
