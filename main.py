@@ -334,7 +334,23 @@ def update_password_route():
 
 @app.route('/otp')
 def otp():
-    return render_template('otp.html')
+
+    remaining = 60
+
+    if session.get('otp_time'):
+
+        remaining = max(
+            0,
+            60 - int(
+                time.time() -
+                session['otp_time']
+            )
+        )
+
+    return render_template(
+        'otp.html',
+        seconds=remaining
+    )
 
 
 @app.route('/verify_otp', methods=['POST'])
