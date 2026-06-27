@@ -1,9 +1,6 @@
 __pycache__/
 *.pyc
-users.db
-QR_auth.db
-static/*
-*.jpg
-!static/styles.css
 .env
 .vscode/
+venv/
+.venv/

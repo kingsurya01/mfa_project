@@ -4,6 +4,11 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Image CAPTCHA — Multi-Factor Auth</title>
+{% if error %}
+<div class="error">
+    {{ error }}
+</div>
+{% endif %}
 <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
 <style>
 .image-wrapper{position:relative;width:100%;margin-bottom:1.1rem}

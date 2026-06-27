@@ -15,8 +15,8 @@ from authenticator import (
     get_secret
 
 )
-
-
+from ip_track import get_ip
+from datetime import date
 from flask import send_file
 import random
 
@@ -24,6 +24,9 @@ import time
 
 app = Flask(__name__)
 app.secret_key = "your_secret_key"
+
+DB = "visitors.db"
+MAX_VISITS = 25
 
 CAPTCHAS = [
     {
@@ -55,8 +58,9 @@ CAPTCHAS = [
         "image": "captcha6.jpg",
         "correct": [5, 6, 8, 9],
         "instruction": "Select motor cycle"
-    }
+    } 
 ]
+  
 
 def get_new_captcha():
 
@@ -78,6 +82,67 @@ def get_new_captcha():
 
     return captcha
 
+@app.before_request
+def track_ip():
+
+
+    ip = get_ip()
+    today = str(date.today())
+
+    conn = sqlite3.connect(DB)
+    cur = conn.cursor()
+
+    cur.execute(
+        "SELECT count, visit_date, blocked FROM ip_logs WHERE ip=?",
+        (ip,)
+    )
+
+    row = cur.fetchone()
+
+    if row:
+
+        count, visit_date, blocked = row
+
+        if blocked:
+            conn.close()
+            abort(403)
+
+        if visit_date != today:
+            count = 0
+
+        count += 1
+
+        if count > MAX_VISITS:
+
+            cur.execute("""
+                UPDATE ip_logs
+                SET count=?,
+                    visit_date=?,
+                    blocked=1
+                WHERE ip=?
+            """, (count, today, ip))
+
+            conn.commit()
+            conn.close()
+
+            abort(403)
+
+        cur.execute("""
+            UPDATE ip_logs
+            SET count=?,
+                visit_date=?
+            WHERE ip=?
+        """, (count, today, ip))
+
+    else:
+
+        cur.execute("""
+            INSERT INTO ip_logs
+            VALUES (?,1,?,0)
+        """, (ip, today))
+
+    conn.commit()
+    conn.close()
 
 @app.route('/captcha')
 def captcha():
@@ -98,10 +163,14 @@ def home():
 
     session['captcha_type'] = captcha_type
     session["captcha_attempts"] = 0
-
+    error = session.pop(
+    "login_error",
+    None
+    )
     if captcha_type == 'text':
         return render_template(
-            'captcha.html'
+        'captcha.html',
+        error=error
         )
 
     session["attempts"] = 0
@@ -116,6 +185,7 @@ def home():
         image=captcha["image"],
         instruction=captcha["instruction"],
         result=""
+        error=error
     )
 
 
@@ -133,6 +203,9 @@ def captcha_check():
         )
 
         if verify_captcha(user_input):
+
+            session["captcha_verified"] = True
+
             return redirect('/login')
 
         session["captcha_attempts"] += 1
@@ -171,6 +244,7 @@ def captcha_check():
         if set(selected) == set(
             captcha["correct"]
         ):
+            session["captcha_verified"] = True
             return redirect('/login')
 
         session["attempts"] += 1
@@ -201,30 +275,34 @@ def captcha_check():
 
 @app.route('/login')
 def login():
-    return render_template('login.html')
 
+    if not session.get("captcha_verified"):
+        return redirect('/')
+
+    return render_template('login.html')
 
 @app.route('/login_verify', methods=['POST'])
 def login_verify_route():
 
     email = request.form['email']
     password = request.form['password']
-
     if verify_password(email, password):
 
         otp, otp_time = send_otp(email)
 
         session['email'] = email
+        session["login_verified"] = True
         session['otp'] = otp
         session['otp_time'] = otp_time
         session['resend_count'] = 0
+        session['otp_attempts'] = 0
 
         return redirect('/otp')
 
-    return render_template(
-    'login.html',
-    error="Invalid Email or Password"
-)
+
+    session['login_error'] = "Invalid Email or Password"
+
+    return redirect('/')
 
 @app.route('/forgot_password')
 def forgot_password():
@@ -335,6 +413,10 @@ def update_password_route():
 @app.route('/otp')
 def otp():
 
+    if not session.get("login_verified"):
+        return redirect('/')
+    
+
     remaining = 60
 
     if session.get('otp_time'):
@@ -365,6 +447,15 @@ def verify_otp_route():
     )
 
     if success:
+
+        session.pop(
+            'otp_attempts',
+            None
+        )
+
+        session['auth_attempts'] = 0
+        session["otp_verified"] = True
+
         return redirect('/authenticator')
 
     if message == "OTP Expired":
@@ -375,7 +466,10 @@ def verify_otp_route():
         )
 
         if count >= 3:
-            return redirect("/")
+
+            session.clear()
+
+            return redirect('/')
 
         email = session.get('email')
 
@@ -386,15 +480,41 @@ def verify_otp_route():
         session['otp'] = otp
         session['otp_time'] = otp_time
         session['resend_count'] = count + 1
+        session['otp_attempts'] = 0
+
+        remaining = 60
 
         return render_template(
             'otp.html',
-            error="OTP expired. New OTP sent to your email."
+            error="OTP expired. New OTP sent to your email.",
+            seconds=remaining
         )
+
+    session['otp_attempts'] = (
+        session.get(
+            'otp_attempts',
+            0
+        ) + 1
+    )
+
+    if session['otp_attempts'] >= 3:
+
+        session.clear()
+
+        return redirect('/')
+
+    remaining = max(
+        0,
+        60 - int(
+            time.time() -
+            session['otp_time']
+        )
+    )
 
     return render_template(
         'otp.html',
-        error=message
+        error=f"{message} ({3 - session['otp_attempts']} attempts left)",
+        seconds=remaining
     )
 
 @app.route('/resend_otp', methods=['POST'])
@@ -421,6 +541,8 @@ def authenticator():
 
     email = session.get('email')
     session['auth_attempts'] = 0
+    if not session.get("otp_verified"):
+        return redirect('/')
 
     new_user = get_secret(email) is None
 
@@ -431,7 +553,10 @@ def authenticator():
 
 @app.route('/qr_code')
 def qr_code():
-
+    
+    if not session.get("otp_verified"):
+        return redirect('/')
+    
     email = session.get('email')
 
     qr_buffer = generate_qr(email)
@@ -461,7 +586,7 @@ def verify_authenticator_route():
             'auth_attempts',
             None
         )
-
+        session["authenticated"] = True
         return redirect('/success')
 
     session['auth_attempts'] = (
@@ -504,10 +629,11 @@ def reset_qr_route():
 @app.route('/success')
 def success():
 
+    if not session.get("authenticated"):
+        return redirect('/')
+
     return """
-    <h1>
-        MFA Authentication Successful
-    </h1>
+    <h1>MFA Authentication Successful</h1>
     """
      
 @app.route('/locked')
