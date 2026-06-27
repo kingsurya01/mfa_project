@@ -1,14 +1,12 @@
-
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Login — Multi-Factor Auth</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Create Account — Multi-Factor Auth</title>
 
 <link rel="stylesheet"
-      href="{{ url_for('static', filename='styles.css') }}" />
-
+      href="{{ url_for('static', filename='styles.css') }}">
 </head>
 
 <body>
@@ -24,15 +22,15 @@
         <div class="brand">
 
             <span class="badge">
-                Step 2 / 4 · Login Verification
+                New User Registration
             </span>
 
             <h1 class="brand-title">
-                Login
+                Create Account
             </h1>
 
             <p class="subtitle">
-                Enter your email and password to continue.
+                Create your account to access the Multi-Factor Authentication system.
             </p>
 
         </div>
@@ -49,16 +47,14 @@
         </div>
         {% endif %}
 
-        <form method="POST" action="/login_verify">
+        <form method="POST"
+              action="/create_account">
 
             <div class="field">
 
-                <label for="email">
-                    Email Address
-                </label>
+                <label>Email Address</label>
 
                 <input
-                    id="email"
                     type="email"
                     name="email"
                     placeholder="Enter your email"
@@ -68,15 +64,26 @@
 
             <div class="field">
 
-                <label for="password">
-                    Password
-                </label>
+                <label>Password</label>
 
                 <input
-                    id="password"
                     type="password"
                     name="password"
-                    placeholder="Enter your password"
+                    placeholder="Create a password"
+                    minlength="6"
+                    required>
+
+            </div>
+
+            <div class="field">
+
+                <label>Confirm Password</label>
+
+                <input
+                    type="password"
+                    name="confirm_password"
+                    placeholder="Confirm your password"
+                    minlength="6"
                     required>
 
             </div>
@@ -85,7 +92,7 @@
                 type="submit"
                 class="neon-button">
 
-                Verify Credentials
+                Create Account
 
             </button>
 
@@ -93,19 +100,14 @@
 
         <div class="footer-note">
 
-            <a href="/forgot_password"
-               class="linkish">
-
-                Forgot Password?
-
-            </a>
+            Already have an account?
 
             <br><br>
 
-            <a href="/register"
+            <a href="/login"
                class="linkish">
 
-                Create New Account
+                Login Here
 
             </a>
 

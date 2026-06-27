@@ -16,7 +16,39 @@ SENDER = os.getenv("APP_EMAIL")
 APP_PASSWORD = os.getenv("APP_PASSWORD")
 
 otp_store = {}
+def create_user(
+    email,
+    password
+):
 
+    conn = sqlite3.connect(
+        "users.db"
+    )
+
+    cur = conn.cursor()
+
+    password_hash = bcrypt.hashpw(
+        password.encode("utf-8"),
+        bcrypt.gensalt()
+    ).decode("utf-8")
+
+    cur.execute(
+        """
+        INSERT INTO users
+        (email, password_hash)
+        VALUES (?, ?)
+        """,
+        (
+            email,
+            password_hash
+        )
+    )
+
+    conn.commit()
+
+    conn.close()
+
+    return True
 def verify_password(email,password):
 
     email = email

@@ -1,8 +1,17 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import (
+    Flask,
+    render_template,
+    request,
+    redirect,
+    session,
+    send_file,
+    abort
+)
 from captcha_verify import generate_captcha, verify_captcha
 from password_verify import (
     verify_password,
     email_exists,
+    create_user,
     send_reset_otp,
     verify_reset_otp,
     update_password
@@ -17,13 +26,19 @@ from authenticator import (
 )
 from ip_track import get_ip
 from datetime import date
+import sqlite3
 from flask import send_file
 import random
 
 import time
 
 app = Flask(__name__)
-app.secret_key = "your_secret_key"
+import os
+
+app.secret_key = os.getenv(
+    "SECRET_KEY",
+    "development-secret"
+)
 
 DB = "visitors.db"
 MAX_VISITS = 25
@@ -82,9 +97,13 @@ def get_new_captcha():
 
     return captcha
 
+
 @app.before_request
 def track_ip():
 
+    
+    if request.path != "/":
+        return
 
     ip = get_ip()
     today = str(date.today())
@@ -93,7 +112,11 @@ def track_ip():
     cur = conn.cursor()
 
     cur.execute(
-        "SELECT count, visit_date, blocked FROM ip_logs WHERE ip=?",
+        """
+        SELECT count, visit_date, blocked
+        FROM ip_logs
+        WHERE ip=?
+        """,
         (ip,)
     )
 
@@ -103,43 +126,55 @@ def track_ip():
 
         count, visit_date, blocked = row
 
+        # Already blocked
         if blocked:
             conn.close()
             abort(403)
 
+        # New day → reset counter
         if visit_date != today:
             count = 0
 
         count += 1
 
-        if count > MAX_VISITS:
+        if count >= MAX_VISITS:
 
-            cur.execute("""
+            cur.execute(
+                """
                 UPDATE ip_logs
                 SET count=?,
                     visit_date=?,
                     blocked=1
                 WHERE ip=?
-            """, (count, today, ip))
+                """,
+                (count, today, ip)
+            )
 
             conn.commit()
             conn.close()
 
             abort(403)
 
-        cur.execute("""
+        cur.execute(
+            """
             UPDATE ip_logs
             SET count=?,
                 visit_date=?
             WHERE ip=?
-        """, (count, today, ip))
+            """,
+            (count, today, ip)
+        )
 
     else:
 
-        cur.execute("""
+        cur.execute(
+            """
             INSERT INTO ip_logs
-            VALUES (?,1,?,0)
-        """, (ip, today))
+            (ip, count, visit_date, blocked)
+            VALUES (?, ?, ?, ?)
+            """,
+            (ip, 1, today, 0)
+        )
 
     conn.commit()
     conn.close()
@@ -148,7 +183,43 @@ def track_ip():
 def captcha():
     return generate_captcha()
 
+@app.route('/register')
+def register():
 
+    return render_template(
+        'register.html'
+    )
+
+@app.route('/create_account', methods=['POST'])
+def create_account():
+
+    email = request.form['email']
+    password = request.form['password']
+    confirm = request.form['confirm_password']
+
+    if password != confirm:
+
+        return render_template(
+            'register.html',
+            error="Passwords do not match"
+        )
+
+    if email_exists(email):
+
+        return render_template(
+            'register.html',
+            error="Email already exists"
+        )
+
+    create_user(
+        email,
+        password
+    )
+
+    return render_template(
+        'login.html',
+        success="Account Created Successfully"
+    )
 @app.route('/')
 def home():
     lock_until = session.get("lock_until")
@@ -184,7 +255,7 @@ def home():
         "image_captcha.html",
         image=captcha["image"],
         instruction=captcha["instruction"],
-        result=""
+        result="",
         error=error
     )
 
