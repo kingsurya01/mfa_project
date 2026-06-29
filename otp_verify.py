@@ -1,7 +1,9 @@
+
 import smtplib
 import random
 import time
 import os
+import socket
 
 sender = os.getenv("APP_EMAIL")
 app_password = os.getenv("APP_PASSWORD")
@@ -11,41 +13,53 @@ MAX_RESENDS = 3
 
 
 def send_otp(receiver):
-
-    otp = str(
-        random.randint(
-            100000,
-            999999
+    if not sender or not app_password:
+        raise ValueError(
+            "APP_EMAIL or APP_PASSWORD environment variables are not set."
         )
-    )
 
-    server = smtplib.SMTP(
-        "smtp.gmail.com",
-        587
-    )
+    otp = str(random.randint(100000, 999999))
 
-    server.starttls()
+    try:
+        server = smtplib.SMTP(
+            "smtp.gmail.com",
+            587,
+            timeout=10
+        )
 
-    server.login(
-        sender,
-        app_password
-    )
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
 
-    message = (
-        f"Subject: OTP Verification\n\n"
-        f"Your OTP is {otp}\n"
-        f"This OTP is valid for {OTP_VALIDITY} seconds."
-    )
+        server.login(
+            sender,
+            app_password
+        )
 
-    server.sendmail(
-        sender,
-        receiver,
-        message
-    )
+        message = (
+            f"Subject: OTP Verification\n\n"
+            f"Your OTP is {otp}\n"
+            f"This OTP is valid for {OTP_VALIDITY} seconds."
+        )
 
-    server.quit()
+        server.sendmail(
+            sender,
+            receiver,
+            message
+        )
 
-    return otp, time.time()
+        server.quit()
+
+        return otp, time.time()
+
+    except socket.timeout:
+        raise Exception("SMTP connection timed out.")
+
+    except smtplib.SMTPAuthenticationError:
+        raise Exception("Invalid Gmail App Password.")
+
+    except Exception as e:
+        raise Exception(f"Unable to send OTP: {e}")
 
 
 def verify_otp(
@@ -53,7 +67,6 @@ def verify_otp(
     stored_otp,
     otp_time
 ):
-
     if time.time() - otp_time > OTP_VALIDITY:
         return False, "OTP Expired"
 
@@ -61,4 +74,3 @@ def verify_otp(
         return True, "OTP Verified"
 
     return False, "Invalid OTP"
-
