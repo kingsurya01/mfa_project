@@ -1,5 +1,8 @@
 __pycache__/
 *.pyc
+QR_auth.db
+users.db
+visitors.db
 .env
 .vscode/
 venv/
